@@ -20,7 +20,7 @@
 #define BLUE 240
 #define RED 0
 #define TOTAL_SECUENCIAS 7
-#define TIEMPO_CAMBIO_AUTO 600000  // En millis
+#define TIEMPO_CAMBIO_AUTO 60000  // En millis
 
 // How many leds in your strip?
 #define NUM_LEDS 100
@@ -46,7 +46,6 @@ bool flag_100ms,flag_100ms_last;
 
 // Timers
 Timer<1, millis, const char *> timer_nevada; // create a timer with 1 task and microsecond resolution
-Timer<1, millis, const char *> timer_cambio_grad; // create a timer with 1 task and microsecond resolution
 Timer<1, millis, const char *> timer_arcoiris; // create a timer with 1 task and microsecond resolution
 Timer<10, millis, const char *> timer_varios;
 
@@ -66,15 +65,14 @@ void setup() {
 
   // Ajuste de tiempo efecto nevada en milis
   timer_nevada.every(100, set_flag_nevada);
-  timer_cambio_grad.every(50, cambio);
   timer_arcoiris.every(50,set_flag_arcoiris);
   timer_varios.every(TIEMPO_CAMBIO_AUTO,incrementa_etapa);
   timer_varios.every(500,timer_500ms);
   timer_varios.every(100,timer_100ms);
-  etapa=0;  
-  modo_auto=false;
+  etapa=1;  
+  modo_auto=true;
   modo_manu=false;
-  modo_off=true;
+  modo_off=false;
   
 
 }
@@ -116,15 +114,16 @@ void timer_500ms(){
   }
 }
 
-// Timer 500ms
+// Timer 100ms
 void timer_100ms(){
   flag_100ms = true;
 }
 
 void incrementa_etapa(){
-  Serial.println("INCREMENTA ETAPA");
+
+Serial.println(etapa);
   if (modo_auto){
-   Serial.println("INCREMENTA ETAPA >>>> 0");   
+
       etapa=etapa+1;
       if (etapa>TOTAL_SECUENCIAS){
         etapa=1;  
@@ -152,6 +151,7 @@ void set_flag_nevada(){
   flag_nevada = true;
 }
 
+            
 // FUNCIÓN ARCO IRIS
 void arcoiris(bool init){
   
@@ -202,7 +202,6 @@ void nevada(bool inicio){
 
 
               
-      Serial.println("INICIO");
       
       FastLED.show(); 
     }
@@ -234,7 +233,7 @@ void nevada(bool inicio){
 void teatro(bool inicio){
 
   CRGB aux;
-  Serial.println(etapa);
+
 
     if(inicio){
     for(uint16_t l=0; l<NUM_LEDS; l++)
@@ -263,7 +262,6 @@ void teatro(bool inicio){
         }
   
         leds[NUM_LEDS-1]=aux;
-        Serial.println("HOLA");
 
         FastLED.show();
 
@@ -282,7 +280,6 @@ void teatro(bool inicio){
 void teatro2(bool inicio){
 
   CRGB aux;
-  Serial.println(etapa);
 
     if(inicio){
     for(uint16_t l=0; l<NUM_LEDS; l++)
@@ -309,7 +306,6 @@ void teatro2(bool inicio){
         }
   
         leds[NUM_LEDS-1]=aux;
-        Serial.println("HOLA");
 
         FastLED.show();
 
@@ -326,6 +322,8 @@ void teatro2(bool inicio){
 // FUNCIÓN CAMBIO GRADUAL
 void cambio(){
 
+    
+    Serial.println(j);
     if (j < 255){
       j = j+1;
     }
@@ -334,6 +332,8 @@ void cambio(){
     }
     
     FastLED.showColor(CHSV(j, 255, 255));
+    flag_100ms = false;
+  
 
 }
 
@@ -406,17 +406,15 @@ void loop() {
   } 
 
   if (modo_auto){
-    digitalWrite(LED_VERDE,true);
-    Serial.println("AUTO"); 
+    digitalWrite(LED_VERDE,true); 
        
   }
   else if (modo_manu){
     digitalWrite(LED_VERDE,pulse_500ms);
-    Serial.println("MANU");
+    
   }
   else{
     digitalWrite(LED_VERDE,false);
-    Serial.println("  OFF  ");
   }
 
 
@@ -432,8 +430,6 @@ void loop() {
   digitalWrite(LED_AZUL,false);
 
 
-
-   Serial.println(etapa);
  // SI SE AÑADEN MÁS ETAPAS ACTUALIZAR CONSTANTE
   switch (etapa) {
   
@@ -457,7 +453,9 @@ void loop() {
           break;
 
         case 4:
-          timer_cambio_grad.tick();  
+          if(flag_100ms){ 
+            cambio();
+          }
           break;
 
         case 5:
@@ -472,7 +470,6 @@ void loop() {
           digitalWrite(LED_AZUL,true);
           val_pot = analogRead(POTENCIOMETRO);  // read the input pin
           val_pot_esc = map(val_pot, 0, 1023, 0, 255); // Escalado de analógica
-          Serial.println(val_pot_esc);          // Envía el valor escalado
           FastLED.showColor(CHSV(val_pot_esc, 255, 255));   
           break;   
         
