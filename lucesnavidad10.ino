@@ -20,7 +20,7 @@
 #define BLUE 240
 #define RED 0
 #define TOTAL_SECUENCIAS 7
-#define TIEMPO_CAMBIO_AUTO 20000  // En millis
+#define TIEMPO_CAMBIO_AUTO 60000  // En millis
 
 // How many leds in your strip?
 #define NUM_LEDS 100
@@ -69,10 +69,10 @@ void setup() {
   timer_varios.every(TIEMPO_CAMBIO_AUTO,incrementa_etapa);
   timer_varios.every(500,timer_500ms);
   timer_varios.every(100,timer_100ms);
-  etapa=0;  
-  modo_auto=false;
+  etapa=1;  
+  modo_auto=true;
   modo_manu=false;
-  modo_off=true;
+  modo_off=false;
   
 
 }
@@ -114,13 +114,14 @@ void timer_500ms(){
   }
 }
 
-// Timer 500ms
+// Timer 100ms
 void timer_100ms(){
   flag_100ms = true;
 }
 
 void incrementa_etapa(){
 
+Serial.println(etapa);
   if (modo_auto){
 
       etapa=etapa+1;
@@ -321,8 +322,8 @@ void teatro2(bool inicio){
 // FUNCIÓN CAMBIO GRADUAL
 void cambio(){
 
-
-
+    
+    Serial.println(j);
     if (j < 255){
       j = j+1;
     }
@@ -405,17 +406,15 @@ void loop() {
   } 
 
   if (modo_auto){
-    digitalWrite(LED_VERDE,true);
-    Serial.println("AUTO"); 
+    digitalWrite(LED_VERDE,true); 
        
   }
   else if (modo_manu){
     digitalWrite(LED_VERDE,pulse_500ms);
-    Serial.println("MANU");
+    
   }
   else{
     digitalWrite(LED_VERDE,false);
-    Serial.println("  OFF  ");
   }
 
 
