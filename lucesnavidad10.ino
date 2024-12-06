@@ -121,15 +121,17 @@ void timer_100ms(){
 
 void incrementa_etapa(){
 
-Serial.println(etapa);
+  Serial.println("INCREMENTA ETAPA");
   if (modo_auto){
 
       etapa=etapa+1;
-      if (etapa>TOTAL_SECUENCIAS){
-        etapa=1;  
-     }
+
     }
-  }
+
+    if (etapa>TOTAL_SECUENCIAS){
+        etapa=1;  
+    }
+ }
   
 
 
@@ -427,25 +429,28 @@ void loop() {
     flag_inicio = false;
   }
 
-  digitalWrite(LED_AZUL,false);
+  
 
 
  // SI SE AÑADEN MÁS ETAPAS ACTUALIZAR CONSTANTE
   switch (etapa) {
   
         case 0: // APAGADO
-          apagado();  
+          apagado();
+          digitalWrite(LED_AZUL,false);  
           break;
   
         case 1: // ARCO IRIS
         
           timer_arcoiris.tick();
-          arcoiris(flag_inicio); 
+          arcoiris(flag_inicio);
+          digitalWrite(LED_AZUL,false); 
           break;
 
         case 2:
           timer_nevada.tick();
-          nevada(flag_inicio);  
+          nevada(flag_inicio);
+          digitalWrite(LED_AZUL,false);  
           break;
 
         case 3:
